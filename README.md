@@ -307,13 +307,12 @@ This is a paragraph.
 2. And this is another one.
 ```
 
-Nested lists are also supported, which can be created with a dash character
-prepended to list items, like so:
+Nested lists are also supported and work by indenting two spaces:
 
 ```markdown
 * This is a list item.
-- * This is a nested list item
-- - 1. This is yet another level of nesting.
-- * And so on.
+  * This is a nested list item
+    1. This is yet another level of nesting.
+  * And so on.
 * And so on.
 ```

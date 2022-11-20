@@ -95,15 +95,15 @@ Paragraph that has an asterisk in it * hello.
 
 * and a new list!
 * woohoo
-- * Nested list
-- * Yes?
-- - 1. And another
-- - 2. More nest
+  - Nested list
+  - Yes?
+    1. And another
+    2. More nest
 * **thing!**
 
 Another paragraph.`;
   const expectedResult =
-    `<p>Paragraph that has a number in it 123.</p><p>Paragraph that has an asterisk in it * hello.</p><ul><li>and a new list!</li><li>woohoo</li><ul><li>Nested list</li><li>Yes?</li><ol><li>And another</li><li>More nest</li></ol></ul><ol><ol><li>And another</li><li>More nest</li></ol></ol><li><strong>thing!</strong></li></ul><p>Another paragraph.</p>`;
+    `<p>Paragraph that has a number in it 123.</p><p>Paragraph that has an asterisk in it * hello.</p><ul><li>and a new list!</li><li>woohoo</li><ul><li>Nested list</li><li>Yes?</li><ol><li>And another</li><li>More nest</li></ol></ul><li><strong>thing!</strong></li></ul><p>Another paragraph.</p>`;
   assertEquals(marky(testString), expectedResult);
 });
 

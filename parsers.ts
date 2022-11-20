@@ -239,10 +239,11 @@ export function quoteBlock(block: string): string {
 }
 
 /**
- * Checks whether the given `block` is a unordered list block.
+ * Checks whether the given `block` is a list block.
  */
+const LIST_REGEX = /^(\s*[\*-123456789]\.?\s.*)[^\*]/gm
 export function isListBlock(block: string): boolean {
-  return !!block.match(/\n-?\s?-?\s?(\*\s.*|\d\.\s.*)[^\*]/g);
+  return !!block.match(LIST_REGEX);
 }
 
 /**
@@ -250,48 +251,37 @@ export function isListBlock(block: string): boolean {
  * Both ordered and unordered lists, as well as nested lists, due to
  * its recursive nature. The output is a mixture of `<ol>` and `<ul>`
  * HTML with list items.
- *
- * As opposed to using two spaces to create a nested list, Marky uses
- * a dash character `-` to signify that the given list should be nested.
- * While the function itself has no limit to nesting, the current regex
- * pattern supports only up to two levels deep nesting.
  */
 export function listBlock(block: string): string {
-  const matches = block.match(/-?\s?-?\s?(\*\s.*|\d\.\s.*)[^\*]/g);
-  const isOrderedList = matches && !matches[0].startsWith("*");
-  const skipIndexes: number[] = [];
-  let result = "";
+  let matches = block.match(LIST_REGEX);
 
   if (matches) {
+    // trim non-space whitespace characters. whitespace is used for nesting
+    matches = matches.map(match => {
+      match.replace(/\n|\/r|\/t/g, '');
+      return match;
+    });
+
+    const isOrderedList = matches && matches[0][0].match(/\d/);
+    let result = "";
     result += isOrderedList ? `<ol>` : `<ul>`;
 
-    matches.forEach((match, index) => {
-      if (skipIndexes.includes(index)) {
-        return;
-      }
-
-      // If the match starts with `-`, it means we're dealing
-      // with nested lists and thus need to stitch those matches
-      // together and pass them back to `marky`.
-      if (match.startsWith("-")) {
-        let captured = match.substring(2);
-        let nextIndex = index + 1;
-        skipIndexes.push(...[index, nextIndex]);
-
-        while (
-          typeof matches[nextIndex] !== "undefined" &&
-          matches[nextIndex].startsWith("-")
-        ) {
-          captured += matches[nextIndex].substring(2);
-          nextIndex += 1;
+    let i = 0;
+    let match = matches[i];
+    while (match) {
+      if (match.startsWith("  ")) {
+        const nestedMatches = [];
+        while (match && match.startsWith("  ")) {
+          nestedMatches.push(match.substring(2));
+          match = matches[++i];
         }
-
-        result += marky(captured);
-      } // Otherwise we continue as-is.
+        result += marky(nestedMatches.join(''));
+      }
       else {
         result += `<li>${match.substring(2).trim()}</li>`;
+        match = matches[++i];
       }
-    });
+    }
 
     result += isOrderedList ? `</ol>` : `</ul>`;
 
