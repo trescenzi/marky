@@ -124,3 +124,9 @@ Why, me too!
     `<h1>The Villain</h1><p>Hello Mr. Bond.</p><p>I've been <em>expecting</em> you.</p><h2>The Bond</h2><p>Why, me too!</p>`;
   assertEquals(marky(testString), expectedResult);
 });
+
+Deno.test("parses the readme", async () => {
+  const readme = await Deno.readTextFile("./README.md");
+  const output = await Deno.readTextFile("./readme_test_output.html");
+  assertEquals(marky(readme), output);
+});
