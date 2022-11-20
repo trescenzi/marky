@@ -95,9 +95,12 @@ function createBlocks(content: string, parsers: Parser[]): string {
  * where it will be polished into fine bits of HTML and handed down
  * to you with great glory.
  */
-export function marky(
-  content: string,
-  parsers: Parser[] = defaultParsers,
-): string {
-  return createBlocks(content, parsers);
+export function marky(content: string): string;
+export function marky(parsers: Parser[]): (content: string) => string;
+export function marky(contentOrParsers: Parser[] | string): string | ((content: string) => string) {
+  if (typeof contentOrParsers === 'string') {
+    return createBlocks(contentOrParsers, defaultParsers);
+  } else {
+    return (content: string) => createBlocks(content, contentOrParsers)
+  }
 }
